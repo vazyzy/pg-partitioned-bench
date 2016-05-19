@@ -1,4 +1,4 @@
-name := "pg-inherit-table-bench"
+name := "pg-partitioned-bench"
 
 version := "1.0"
 
@@ -14,4 +14,4 @@ libraryDependencies ++= Seq (
 
 TwirlKeys.templateImports += "vazyzy.pgbench._"
 
-lazy val root = Project("pg-inherit-table-bench", file(".")).enablePlugins(SbtTwirl)
+lazy val root = Project("pg-partitioned-bench", file(".")).enablePlugins(SbtTwirl)
