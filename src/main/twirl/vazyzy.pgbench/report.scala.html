@@ -1,0 +1,64 @@
+@(part: Metrics, std: Metrics)
+
+<script src="https://code.jquery.com/jquery-2.2.3.min.js"
+        integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
+        crossorigin="anonymous"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+
+<script>
+    $(function () {
+    $('#container').highcharts({
+        title: {
+            text: 'Report',
+            x: -20 //center
+        },
+        yAxis: {
+            title: {
+                text: 'duration (ms)'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 1
+        },
+        series: [{
+            name: 'Partitioned Table',
+            data: [@part.metricsStorage.mkString(",")]
+        }, {
+            name: 'Standard Table',
+            data: [@std.metricsStorage.mkString(",")]
+        }]
+    });
+});
+</script>
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<table>
+    <thead>
+    <th>measure</th>
+    <th>standard</th>
+    <th>partitioned</th>
+    </thead>
+    <tr>
+        <td> Max </td>
+        <td> @std.getMax </td>
+        <td> @part.getMax </td>
+    </tr>
+    <tr>
+        <td> Min </td>
+        <td> @std.getMin </td>
+        <td> @part.getMin </td>
+    </tr>
+    <tr>
+        <td> Avg </td>
+        <td> @std.getAvg </td>
+        <td> @part.getAvg </td>
+    </tr>
+
+</table>

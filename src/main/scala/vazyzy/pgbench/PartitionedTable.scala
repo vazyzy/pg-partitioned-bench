@@ -1,3 +1,5 @@
+package vazyzy.pgbench
+
 import slick.driver.PostgresDriver.api._
 
 object PartitionedTable {
@@ -13,7 +15,7 @@ object PartitionedTable {
 
   def createTrigger: DBIO[Int] =
     sqlu"""
-         -- DROP TRIGGER partition_trigger ON partition_master;
+          DROP TRIGGER partition_trigger ON partition_master;
           CREATE TRIGGER partition_trigger
               BEFORE INSERT ON partition_master
               FOR EACH ROW EXECUTE PROCEDURE partition_insert();

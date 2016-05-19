@@ -1,27 +1,21 @@
-import java.util.UUID
-
-import com.typesafe.config.ConfigFactory
-import slick.driver.PostgresDriver.api._
+package vazyzy.pgbench
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-import scala.util.Random
 
 trait Metrics {
-  var metricsStorage: mutable.ArrayBuffer[Long] = mutable.ArrayBuffer[Long]()
 
-  def addMetric(value: Long): Unit = {
+  val metricsStorage: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer[Int]()
+
+  def addMetric(value: Int): Unit = {
     metricsStorage += value
   }
 
-  def getMax: Long = {
+  def getMax: Int = {
     metricsStorage.max
   }
 
-  def getMin: Long = {
-    metricsStorage.max
+  def getMin: Int = {
+    metricsStorage.min
   }
 
   def getAvg: Double = {
