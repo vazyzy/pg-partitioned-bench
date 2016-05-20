@@ -4,17 +4,17 @@ import scala.collection.mutable
 
 trait Metrics {
 
-  val metricsStorage: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer[Int]()
+  val metricsStorage: mutable.ArrayBuffer[Long] = mutable.ArrayBuffer[Long]()
 
-  def addMetric(value: Int): Unit = {
+  def addMetric(value: Long): Unit = {
     metricsStorage += value
   }
 
-  def getMax: Int = {
+  def getMax: Long = {
     metricsStorage.max
   }
 
-  def getMin: Int = {
+  def getMin: Long = {
     metricsStorage.min
   }
 

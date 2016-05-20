@@ -41,9 +41,9 @@ trait Benchmark extends Metrics {
 
       Future(Thread.sleep(1000/conf.velocity * i))
         .flatMap(_ => {
-          val start = System.currentTimeMillis()
+          val start = System.nanoTime()
           db.run(PartitionedTable.insert(partition, attr))
-            .map(_ => addMetric((System.currentTimeMillis() - start).toInt))
+            .map(_ => addMetric((System.nanoTime() - start)/1000000))
         })
     })
 
