@@ -1,42 +1,32 @@
 package vazyzy.pgbench
+import scala.collection.convert.decorateAsScala._
+import java.util.concurrent.ConcurrentHashMap
 
-import scala.collection.mutable
+
 
 trait Metrics {
 
-  val metricsStorage: mutable.ArrayBuffer[Long] = mutable.ArrayBuffer[Long]()
+  val metricsStorage = new ConcurrentHashMap[Long, Long]().asScala
 
-  def addMetric(value: Long): Unit = {
-    metricsStorage += value
+  def getSeries(): Seq[(Long, Long)] ={
+    val sortedSeries = metricsStorage.toSeq.sortBy(_._1)
+    sortedSeries.map({case (x, y) => (x - sortedSeries.head._1, y)})
+  }
+
+  def addMetric(key: Long, value: Long): Unit = {
+    metricsStorage.put(key, value)
   }
 
   def getMax: Long = {
-    metricsStorage.max
+    metricsStorage.values.max
   }
 
   def getMin: Long = {
-    metricsStorage.min
+    metricsStorage.values.min
   }
 
   def getAvg: Double = {
-    metricsStorage.sum / metricsStorage.length
-  }
-
-  def saveToFile(path: String): Unit = {
-    import java.io._
-
-    def printToFile(f: java.io.File)(op: java.io.PrintWriter => Unit) {
-      val p = new java.io.PrintWriter(f)
-      try {
-        op(p)
-      } finally {
-        p.close()
-      }
-    }
-
-    printToFile(new File(path)) { p =>
-      metricsStorage.foreach(p.println)
-    }
+    metricsStorage.values.sum / metricsStorage.size
   }
 
 }

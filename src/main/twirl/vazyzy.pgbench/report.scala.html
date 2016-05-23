@@ -28,10 +28,10 @@
         },
         series: [{
             name: 'Partitioned Table',
-            data: [@part.metricsStorage.mkString(",")]
+            data: [@part.getSeries.map(x => s"[${x._1},${x._2}]").mkString(",")]
         }, {
             name: 'Standard Table',
-            data: [@std.metricsStorage.mkString(",")]
+            data: [@std.getSeries.map(x => s"[${x._1},${x._2}]").mkString(",")]
         }]
     });
 });

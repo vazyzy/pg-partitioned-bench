@@ -2,19 +2,14 @@ package vazyzy.pgbench
 
 import java.util.UUID
 
-import com.typesafe.config.ConfigFactory
 import slick.driver.PostgresDriver.api._
 import vazyzy.pgbench.Benchmark.Conf
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.util.Random
 
-trait Benchmark extends Metrics {
-
-  val conf = ConfigFactory.load()
-  val db = Database.forConfig("pgConf")
+abstract class Benchmark(db: Database) extends Metrics {
 
   /**
    * Prepare tables for benchmark.
@@ -29,34 +24,38 @@ trait Benchmark extends Metrics {
   def insert(partition: Int, attr: String): Future[Unit]
 
   /**
-   * Start benchmark asynchronyosly
-   * @param conf
-   * @return
+   * Start benchmark asynchronously.
+   * @param conf - benchmark Config.
    */
   def run(conf: Conf): Future[Unit] = {
     prepare()
     val requests = 0 to conf.requestCount map (i => {
       val partition = Random.nextInt(conf.numPartitions)
       val attr = UUID.randomUUID().toString
-
-      Future(Thread.sleep(1000/conf.velocity * i))
-        .flatMap(_ => {
-          val start = System.nanoTime()
-          db.run(PartitionedTable.insert(partition, attr))
-            .map(_ => addMetric((System.nanoTime() - start)/1000000))
-        })
+      val timeout = Math.pow(10, -9) / conf.velocity * i
+      Utils.schedule(timeout.toLong) {
+        val start = System.nanoTime()
+        db.run(PartitionedTable.insert(partition, attr))
+          .map(_ => addMetric(i, (System.nanoTime() - start) / 1000000))
+      }
     })
 
     Future
       .sequence(requests)
-      .mapTo[Unit]
+      .map(_ => {})
   }
 }
+
+
 object Benchmark {
 
+  /**
+   * @param velocity - requests per second.
+   * @param requestCount - number of operations.
+   * @param numPartitions - number of table partitions.
+   */
   case class Conf(velocity: Long,
                   requestCount: Int,
-                  numPartitions: Int,
-                  concurrency: Long)
+                  numPartitions: Int)
 
 }

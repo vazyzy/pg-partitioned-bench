@@ -5,8 +5,9 @@ import slick.driver.PostgresDriver.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import slick.driver.PostgresDriver.api._
 
-class SimpleBench extends Benchmark {
+class SimpleBench(db: Database) extends Benchmark(db) {
   
   override def prepare(): Unit = {
     val request = db.run(
