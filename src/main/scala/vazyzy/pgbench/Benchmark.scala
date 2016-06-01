@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.Random
 
-abstract class Benchmark(db: Database) extends Metrics {
+trait Benchmark extends Metrics {
 
   /**
    * Prepare tables for benchmark.
@@ -24,10 +24,16 @@ abstract class Benchmark(db: Database) extends Metrics {
   def insert(partition: Int, attr: String): Future[Unit]
 
   /**
-   * Start benchmark asynchronously.
+   * Read command.
+   * @param partition - key in table for partitioning.
+   * @param attr - arbitrary attribute.
+   */
+  def read(partition: Int, attr: String): Future[Unit]
+
+  /**
    * @param conf - benchmark Config.
    */
-  def run(conf: Conf): Future[Unit] = {
+  def runInserts(conf: Conf): Future[Unit] = {
     prepare()
     val requests = 0 to conf.requestCount map (i => {
       val partition = Random.nextInt(conf.numPartitions)
@@ -35,7 +41,7 @@ abstract class Benchmark(db: Database) extends Metrics {
       val timeout = Math.pow(10, -9) / conf.velocity * i
       Utils.schedule(timeout.toLong) {
         val start = System.nanoTime()
-        db.run(PartitionedTable.insert(partition, attr))
+        this.insert(partition, attr)
           .map(_ => addMetric(i, (System.nanoTime() - start) / 1000000))
       }
     })

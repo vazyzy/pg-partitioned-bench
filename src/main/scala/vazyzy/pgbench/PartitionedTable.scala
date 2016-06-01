@@ -43,4 +43,10 @@ object PartitionedTable {
         """
   }
 
+  def read(partition: Int, attr: String): DBIO[Seq[(String, Int, String)]] ={
+    sql"""
+          Select * FROM partition_master WHERE partitionKey='$partition'
+        """.as[(String, Int, String)]
+  }
+
 }

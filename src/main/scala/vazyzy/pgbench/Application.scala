@@ -14,20 +14,22 @@ object Application extends App {
   val db = Database.forConfig("pgConf")
 
   val bench1Conf = Conf(
-    velocity = 1000,
+    velocity = 100,
     requestCount = 1000,
     numPartitions = 10
   )
 
   val bench = new PartitionBench(db)
   val bench2 = new PartitionBench(db)
-  bench.run(bench1Conf).awaitInf
-  bench2.run(bench1Conf).awaitInf
+  bench.runInserts(bench1Conf).awaitInf
+  bench2.runInserts(bench1Conf).awaitInf
 
   val pw = new PrintWriter(new File("report.html" ))
   pw.write(vazyzy.pgbench.html.report(bench, bench2).toString())
   pw.close()
   db.close()
+
+
 }
 
 
